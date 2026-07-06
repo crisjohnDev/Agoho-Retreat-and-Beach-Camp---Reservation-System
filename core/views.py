@@ -116,3 +116,7 @@ def add_room(request):
             return redirect('room_list')  # Redirect to room list page after successful creation
         
     return render(request, 'admin/add_room.html')
+
+@login_required
+def booking_list(request):
+    return render(request, 'admin/booking_list.html')

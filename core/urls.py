@@ -11,4 +11,5 @@ urlpatterns = [
     path('account/customer-management/suspend/<int:id>/', views.customer_suspend, name='customer_suspend'),
     path('account/room-management/', views.room_list, name='room_list'),
     path('account/room-management/add/', views.add_room, name='room_create'),
+    path('account/booking-management/', views.booking_list, name='booking_list'),
 ]

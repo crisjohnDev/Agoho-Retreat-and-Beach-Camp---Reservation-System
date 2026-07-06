@@ -1,0 +1,155 @@
+{% extends "admin.html" %}
+
+{% block content %}
+<!-- Custom Styling Extensions for Booking States & Calendar Elements -->
+<style>
+    .status-badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        display: inline-block;
+        text-align: center;
+        min-width: 90px;
+    }
+    .status-pending { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .status-confirmed { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .status-cancelled { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    
+    .btn-action-icon {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.85rem;
+        border-radius: 4px;
+        transition: all 0.15s ease;
+    }
+    /* Style for the real-time operational context tag */
+    .ledger-date-badge {
+        background-color: #070a10;
+        border: 1px solid var(--resort-border);
+        border-radius: 6px;
+        padding: 0.5rem 0.85rem;
+    }
+</style>
+
+<!-- Dashboard Top Header Bar -->
+<header class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--resort-border) !important;">
+    <div>
+        <h2 class="h4 fw-bold mb-1">Reservation Ledger</h2>
+        <p class="text-muted small mb-0">Review processing timelines, approve pending access itineraries, or cancel room schedules.</p>
+    </div>
+    
+    <!-- Real-time Auditing Metadata Indicator Display -->
+    <div class="ledger-date-badge d-flex align-items-center gap-2 align-self-start align-self-md-auto">
+        <i class="bi bi-calendar3 text-gold" style="color: var(--resort-gold);"></i>
+        <div class="lh-sm">
+            <span class="text-muted x-small d-block text-uppercase fw-bold" style="letter-spacing: 0.5px;">Operational Date</span>
+            <!-- Dynamically uses server time framework drop-in configuration -->
+            <span class="text-main small font-monospace fw-semibold">{% now "Y-m-d" %}</span>
+        </div>
+    </div>
+</header>
+
+<!-- Main Reservation Administration Table -->
+<section class="custom-table-card mt-0">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 14%;">Log Date</th>
+                    <th scope="col" style="width: 20%;">Customer Name</th>
+                    <th scope="col" style="width: 10%;">Room No.</th>
+                    <th scope="col" style="width: 13%;">Check-In</th>
+                    <th scope="col" style="width: 13%;">Check-Out</th>
+                    <th scope="col" style="width: 12%;">Total Price</th>
+                    <th scope="col" style="width: 8%;">Status</th>
+                    <th scope="col" style="width: 10%;" class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <!-- Creation Log Date (Tracks original reservation intake submission date) -->
+                    <td>
+                        <span class="small font-monospace text-muted d-block">{{ booking.created_at|date:"Y-m-d"|default:"2026-07-07" }}</span>
+                        <span class="x-small text-muted" style="font-size: 0.7rem;">{{ booking.created_at|date:"H:i"|default:"05:47" }} UTC</span>
+                    </td>
+
+                    <!-- Customer Information Block -->
+                    <td>
+                        <span class="fw-semibold text-main d-block">{{ booking.customer_name }}</span>
+                        <span class="text-muted x-small">ID: #{{ booking.id|default:forloop.counter0|add:8840 }}</span>
+                    </td>
+                    
+                    <!-- Room Tracking Pointer -->
+                    <td>
+                        <span class="badge bg-dark border text-light px-2 py-1" style="border-color: var(--resort-border) !important;">
+                            #{{ booking.room_number }}
+                        </span>
+                    </td>
+                    
+                    <!-- Chronological Milestones -->
+                    <td>
+                        <span class="small font-monospace text-main">{{ booking.check_in|date:"Y-m-d"|default:booking.check_in }}</span>
+                    </td>
+                    <td>
+                        <span class="small font-monospace text-main">{{ booking.check_out|date:"Y-m-d"|default:booking.check_out }}</span>
+                    </td>
+                    
+                    <!-- Financial Metrics -->
+                    <td>
+                        <span class="text-gold fw-semibold" style="color: var(--resort-gold);">${{ booking.total_price }}</span>
+                    </td>
+                    
+                    <!-- Variable Operational State Badges -->
+                    <td>
+                        {% if booking.status == 'Confirmed' or booking.status == 'confirmed' %}
+                            <span class="status-badge status-confirmed">Confirmed</span>
+                        {% elif booking.status == 'Cancelled' or booking.status == 'cancelled' %}
+                            <span class="status-badge status-cancelled">Cancelled</span>
+                        {% else %}
+                            <span class="status-badge status-pending">Pending</span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Interactive State Pipelines (Confirm / Cancel Buttons) -->
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-2">
+                            <!-- Show confirm action only if reservation state isn't locked down yet -->
+                            {% if booking.status != 'Confirmed' and booking.status != 'confirmed' and booking.status != 'Cancelled' and booking.status != 'cancelled' %}
+                            <form action="{% url 'booking_confirm' booking.id %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success btn-action-icon" title="Confirm Reservation">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                            
+                            <!-- Show cancel options if the log row is active or waiting -->
+                            {% if booking.status != 'Cancelled' and booking.status != 'cancelled' %}
+                            <form action="{% url 'booking_cancel' booking.id %}" method="POST" class="d-inline"
+                                  onsubmit="return confirm('Revoke this booking reservation? Room vacancy settings will revert instantly.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger btn-action-icon" title="Cancel Reservation">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted small x-small italic">Immutable</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <!-- Empty Dataset Matrix Fallback Handler -->
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <div class="text-muted mb-2"><i class="bi bi-calendar-x fs-2"></i></div>
+                        <h6 class="text-muted mb-0">No booking profiles or transactions matched the current data filter loop.</h6>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
