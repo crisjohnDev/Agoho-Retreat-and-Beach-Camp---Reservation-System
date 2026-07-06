@@ -1,0 +1,128 @@
+{% extends "admin.html" %}
+
+{% block content %}
+<!-- Custom Utility Styles Optimized for Customer Information Elements -->
+<style>
+    .avatar-customer {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background-color: rgba(212, 175, 55, 0.08);
+        color: var(--resort-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: 1px solid rgba(212, 175, 55, 0.15);
+    }
+    .status-active { 
+        background-color: rgba(16, 185, 129, 0.1); 
+        color: #10b981; 
+    }
+    .status-suspended { 
+        background-color: rgba(239, 68, 68, 0.1); 
+        color: #ef4444; 
+    }
+    .text-truncate-address {
+        max-width: 220px;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+</style>
+
+<!-- Dashboard Top Header Bar -->
+<header class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--resort-border) !important;">
+    <div>
+        <h2 class="h4 fw-bold mb-1">Customer Registry</h2>
+        <p class="text-muted small mb-0">Monitor verified guests, communication endpoints, and manage file access permissions.</p>
+    </div>
+</header>
+
+<!-- Main Customer Administration Table Component -->
+<section class="custom-table-card mt-0">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 25%;">Full Name</th>
+                    <th scope="col" style="width: 20%;">Email Address</th>
+                    <th scope="col" style="width: 15%;">Phone Number</th>
+                    <th scope="col" style="width: 25%;">Physical Address</th>
+                    <th scope="col" style="width: 15%;" class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <!-- Full Name Profiling Column -->
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-customer">
+                                {{ customer.first_name|slice:":1" }}{% if customer.last_name %}{{ customer.last_name|slice:":1" }}{% endif %}
+                            </div>
+                            <div>
+                                <span class="fw-semibold d-block {% if customer.is_suspended %}text-muted text-decoration-line-through{% endif %}">
+                                    {{ customer.full_name }}
+                                </span>
+                                <span class="text-muted small">Ref: #{{ customer.id|default:forloop.counter0|add:1042 }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <!-- Email Touchpoint -->
+                    <td>
+                        <span class="{% if customer.is_suspended %}text-muted text-decoration-line-through{% else %}text-main{% endif %}">
+                            {{ customer.email }}
+                        </span>
+                    </td>
+                    
+                    <!-- Phone Touchpoint -->
+                    <td>
+                        <span class="text-muted small font-monospace">{{ customer.phone_number }}</span>
+                    </td>
+                    
+                    <!-- Physical Address Column (Safely Truncated for Layout Responsiveness) -->
+                    <td>
+                        <span class="text-muted small text-truncate-address" title="{{ customer.address }}">
+                            {{ customer.address }}
+                        </span>
+                    </td>
+                    
+                    <!-- Suspended Toggle Access Pipelines -->
+                    <td class="text-end">
+                        {% if customer.is_suspended %}
+                            <form action="{% url 'customer_reactivate' customer.id %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success px-3 py-1" style="font-size: 0.8rem;">
+                                    <i class="bi bi-person-check me-1"></i> Activate
+                                </button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'customer_suspend' customer.id %}" method="POST" class="d-inline" 
+                                  onsubmit="return confirm('Are you sure you want to suspend this customer profile? This restricts access immediately.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger px-3 py-1" style="font-size: 0.8rem;">
+                                    <i class="bi bi-person-x-fill me-1"></i> Suspend
+                                </button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <!-- Empty State Exception Fallback Handler -->
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="text-muted mb-2"><i class="bi bi-people-fill fs-2"></i></div>
+                        <h6 class="text-muted mb-0">No active customer directory files match your data environment schema.</h6>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

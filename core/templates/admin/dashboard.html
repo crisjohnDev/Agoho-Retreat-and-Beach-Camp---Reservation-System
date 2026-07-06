@@ -1,0 +1,106 @@
+{% extends "admin.html" %}
+
+{% block content %}
+        <!-- Dashboard Top Header Bar -->
+        <header class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--resort-border) !important;">
+            <div class="d-flex align-items-center gap-3">
+                <button class="toggle-sidebar-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+                <div>
+                    <h2 class="h4 fw-bold mb-1">Reservation Overview</h2>
+                    <p class="text-muted small mb-0">Welcome back, System Clerk.</p>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <span class="small text-muted d-none d-sm-inline"><i class="bi bi-circle-fill text-success me-1" style="font-size: 8px;"></i> Live PMS Server</span>
+                <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--resort-gold-muted); border: 1px solid var(--resort-gold); display: flex; align-items: center; justify-content: center; color: var(--resort-gold);">
+                    <i class="bi bi-person-circle fs-5"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Metric Component Ribbon Grid Block -->
+        <section class="row g-3">
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="metric-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small d-block mb-1">Total Occupancy</span>
+                        <h3 class="fw-bold mb-0">84%</h3>
+                    </div>
+                    <div class="metric-icon-box"><i class="bi bi-building"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="metric-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small d-block mb-1">Active Bookings</span>
+                        <h3 class="fw-bold mb-0">142</h3>
+                    </div>
+                    <div class="metric-icon-box"><i class="bi bi-calendar2-range"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="metric-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small d-block mb-1">Total Customers</span>
+                        <h3 class="fw-bold mb-0">1,829</h3>
+                    </div>
+                    <div class="metric-icon-box"><i class="bi bi-people"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="metric-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small d-block mb-1">Gross Revenue</span>
+                        <h3 class="fw-bold mb-0">$24.5k</h3>
+                    </div>
+                    <div class="metric-icon-box"><i class="bi bi-currency-dollar"></i></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Information Active Bookings Viewport Component -->
+        <section class="custom-table-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h5 fw-bold m-0">Recent Booking Enforcements</h4>
+                <button class="btn btn-sm text-decoration-none" style="color: var(--resort-gold); font-size: 0.85rem;">View All Books <i class="bi bi-arrow-right"></i></button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Guest</th>
+                            <th>Villa/Room</th>
+                            <th>Stay Period</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="fw-semibold">Elena Rostova</span></td>
+                            <td>Premium Ocean Villa (Rm 104)</td>
+                            <td>Jul 05 - Jul 12</td>
+                            <td><span class="status-badge status-confirmed">Confirmed</span></td>
+                            <td><button class="btn btn-link btn-sm p-0 style-link text-muted" style="font-size: 1.1rem;"><i class="bi bi-three-dots-vertical"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fw-semibold">Marcus Vance</span></td>
+                            <td>Forest Canopy Suite (Rm 208)</td>
+                            <td>Jul 06 - Jul 09</td>
+                            <td><span class="status-badge status-pending">Pending Approval</span></td>
+                            <td><button class="btn btn-link btn-sm p-0 style-link text-muted" style="font-size: 1.1rem;"><i class="bi bi-three-dots-vertical"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td><span class="fw-semibold">Aiko Tanaka</span></td>
+                            <td>Garden Oasis Villa (Rm 112)</td>
+                            <td>Jul 08 - Jul 15</td>
+                            <td><span class="status-badge status-confirmed">Confirmed</span></td>
+                            <td><button class="btn btn-link btn-sm p-0 style-link text-muted" style="font-size: 1.1rem;"><i class="bi bi-three-dots-vertical"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+{% endblock %}

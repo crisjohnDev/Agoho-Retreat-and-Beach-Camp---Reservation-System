@@ -1,0 +1,142 @@
+{% extends "admin.html" %}
+
+{% block content %}
+<!-- Custom Design Adjustments for Room Assets -->
+<style>
+    .btn-gold {
+        background-color: var(--resort-gold);
+        color: #090d16;
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    .btn-gold:hover {
+        background-color: #f3cf55;
+        color: #090d16;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    }
+    .room-img-preview {
+        width: 70px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid var(--resort-border);
+        background-color: #070a10;
+    }
+    .room-badge-type {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #e5e7eb;
+        border: 1px solid var(--resort-border);
+    }
+    .status-available { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .status-occupied { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    
+    .desc-truncate {
+        max-width: 250px;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+</style>
+
+<!-- Dashboard Top Header Bar -->
+<header class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--resort-border) !important;">
+    <div>
+        <h2 class="h4 fw-bold mb-1">Room Inventory</h2>
+        <p class="text-muted small mb-0">Configure resort accommodations, real-time availability vectors, and baseline rate tables.</p>
+    </div>
+    
+    <!-- Explicit Add Room Routing Link (No Modal) -->
+    <div>
+        <a href="{% url 'room_create' %}" class="btn btn-gold d-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle-fill"></i> Add New Room
+        </a>
+    </div>
+</header>
+
+<!-- Main Inventory Administration Table Component -->
+<section class="custom-table-card mt-0">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 12%;">Visual Asset</th>
+                    <th scope="col" style="width: 12%;">Room No.</th>
+                    <th scope="col" style="width: 18%;">Accommodation Type</th>
+                    <th scope="col" style="width: 15%;">Nightly Rate</th>
+                    <th scope="col" style="width: 28%;">Room Description</th>
+                    <th scope="col" style="width: 15%;" class="text-end">Live Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <!-- Dynamic Visual Preview -->
+                    <td>
+                        {% if room.image %}
+                            <img src="{{ room.image.url }}" class="room-img-preview" alt="Room {{ room.room_number }} overview">
+                        {% else %}
+                            <div class="room-img-preview d-flex align-items-center justify-content-center text-muted small fs-d">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Identification Code -->
+                    <td>
+                        <span class="fw-bold text-main">#{{ room.room_number }}</span>
+                    </td>
+                    
+                    <!-- Property Blueprint Class -->
+                    <td>
+                        <span class="room-badge-type">{{ room.room_type }}</span>
+                    </td>
+                    
+                    <!-- Financial Parameters -->
+                    <td>
+                        <span class="text-gold fw-semibold" style="color: var(--resort-gold);">${{ room.price }}</span>
+                        <span class="text-muted x-small"></span>
+                    </td>
+                    
+                    <!-- Descriptive Block Context -->
+                    <td>
+                        <span class="text-muted small desc-truncate" title="{{ room.room_description }}">
+                            {{ room.room_description }}
+                        </span>
+                    </td>
+                    
+                    <!-- Access Pipeline Status Indicator Toggle -->
+                    <td class="text-end">
+                        {% if room.is_available %}
+                            <span class="status-badge status-available d-inline-block px-3 py-1 text-center" style="min-width: 95px;">
+                                <i class="bi bi-check-circle-fill me-1 small"></i> Ready
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-occupied d-inline-block px-3 py-1 text-center" style="min-width: 95px;">
+                                <i class="bi bi-dash-circle-fill me-1 small"></i> Occupied
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <!-- Empty Dataset Fallback UI Matrix -->
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="text-muted mb-2"><i class="bi bi-door-closed fs-1"></i></div>
+                        <h6 class="text-muted mb-0">No resort rooms have been committed to this system registry schema yet.</h6>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

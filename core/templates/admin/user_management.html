@@ -1,0 +1,139 @@
+{% extends "admin.html" %}
+
+{% block content %}
+<!-- Dashboard Top Header Bar -->
+<header class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--resort-border) !important;">
+    <div class="d-flex align-items-center gap-3">
+        <button class="toggle-sidebar-btn d-lg-none" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+        <div>
+            <h2 class="h4 fw-bold mb-1">User Management</h2>
+            <p class="text-muted small mb-0">Manage system operators, staff roles, and access parameters.</p>
+        </div>
+    </div>
+    
+    <!-- Explicit Add User Trigger (No Modal, Direct Route Target Link) -->
+    <div>
+        <a href="{% url 'user_create' %}" class="btn btn-gold d-flex align-items-center gap-2">
+            <i class="bi bi-person-plus-fill"></i> Add New User
+        </a>
+    </div>
+</header>
+
+<!-- Custom Utility Styles for User Management Elements -->
+<style>
+    .btn-gold {
+        background-color: var(--resort-gold);
+        color: #090d16;
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    .btn-gold:hover {
+        background-color: #f3cf55;
+        color: #090d16;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    }
+    .avatar-placeholder {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background-color: var(--resort-gold-muted);
+        color: var(--resort-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    .role-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #e5e7eb;
+        border: 1px solid var(--resort-border);
+    }
+    .role-badge.admin {
+        background-color: rgba(212, 175, 55, 0.08);
+        color: var(--resort-gold);
+        border-color: rgba(212, 175, 55, 0.2);
+    }
+    .status-active { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .status-suspended { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+</style>
+
+<!-- Context Metrics Bar -->
+<section class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="metric-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small d-block mb-1">Active Administrators</span>
+                <h3 class="fw-bold mb-0">{{ total_admin }}</h3>
+            </div>
+            <div class="metric-icon-box"><i class="bi bi-shield-check"></i></div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="metric-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small d-block mb-1">Total Desk Staff</span>
+                <h3 class="fw-bold mb-0">{{ total_staff }}</h3>
+            </div>
+            <div class="metric-icon-box"><i class="bi bi-person-workspace"></i></div>
+        </div>
+    </div>
+</section>
+
+<!-- Main User Management Table Component -->
+<section class="custom-table-card mt-0">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>System Role</th>
+                    <th>Account Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Row Item 1: Administrator Example -->
+                 {% for i in users  %}
+                <tr>
+                    <td><span class="text-main">{{i.username}}</span></td>
+                    <td><span class="role-badge admin"><i class="bi bi-shield-shaded me-1"></i> {{ i.role}}</span></td>
+                    <td><span class="status-badge status-active">{{ i.is_active|yesno:"Active,Inactive" }}</span></td>
+                    <td class="text-end">
+                        <div class="d-inline-flex gap-2">
+                            <a href="{% url 'user_update' i.id %}" class="btn btn-sm btn-outline-light px-2 py-1" style="border-color: var(--resort-border); font-size: 0.8rem;" title="Update Settings">
+                                <i class="bi bi-pencil-square me-1"></i> Update
+                            </a>
+                            <form method="POST"
+                                action="{% url 'user_suspend' i.id %}"
+                                class="d-inline"
+                                onsubmit="return confirm('Are you sure you want to suspend this user?');">
+
+                                {% csrf_token %}
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-warning"
+                                        title="Suspend User">
+
+                                    <i class="bi bi-person-x-fill"></i> Suspend
+
+                                </button>
+
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
