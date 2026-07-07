@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect
 from .utils import create_default_admin
 from django.contrib.auth import authenticate, login, logout
 
+
+
 def login_view(request):
     create_default_admin()
 
@@ -16,13 +18,11 @@ def login_view(request):
         if user is not None:
             login(request, user)
 
-            # 🔥 Role-based redirection
             if user.role == 'admin':
                 return redirect('admin_dashboard')
-            elif user.role == 'controller':
-                return redirect('controller_dashboard')
-            elif user.role == 'viewer':
-                return redirect('viewer_dashboard')
+            elif user.role == 'staff':
+                return redirect('staff_dashboard')
+
             else:
                 return redirect('login')
 
@@ -33,3 +33,4 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+

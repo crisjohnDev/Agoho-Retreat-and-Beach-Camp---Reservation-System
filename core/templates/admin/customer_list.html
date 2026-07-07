@@ -61,14 +61,10 @@
                     <!-- Full Name Profiling Column -->
                     <td>
                         <div class="d-flex align-items-center gap-3">
-                            <div class="avatar-customer">
-                                {{ customer.first_name|slice:":1" }}{% if customer.last_name %}{{ customer.last_name|slice:":1" }}{% endif %}
-                            </div>
                             <div>
                                 <span class="fw-semibold d-block {% if customer.is_suspended %}text-muted text-decoration-line-through{% endif %}">
                                     {{ customer.full_name }}
                                 </span>
-                                <span class="text-muted small">Ref: #{{ customer.id|default:forloop.counter0|add:1042 }}</span>
                             </div>
                         </div>
                     </td>
