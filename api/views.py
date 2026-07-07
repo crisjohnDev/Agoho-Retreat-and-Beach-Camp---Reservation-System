@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 from decimal import Decimal
 from datetime import date
 # React
@@ -13,7 +13,6 @@ from rest_framework import status
 
 from core.models import Rooms
 
-# Create your views here.
 # Mobile
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
